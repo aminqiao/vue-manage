@@ -102,7 +102,11 @@ module.exports = {
       apiOptions: {
         cssImageRef: "./sprites-generated.png", // css文件中引用雪碧图的相对位置路径配置
       },
+    }),
+    new webpack.ProvidePlugin({
+      $:"jquery",
+      jQuery:"jquery",
+      "window.jQuery":"jquery"
     })
-  ],
-  
+  ]
 }

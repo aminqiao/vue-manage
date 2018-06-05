@@ -1,12 +1,13 @@
 <template>
   <div id="container" class="wrap">
       <button id="add" @click=newBtn()>增加节点</button>
-      <div class="icon-logo"></div>
+      <button @click=line()>连接节点</button>
   </div>
 </template>
 
 <script>
-import '../../assets/css/sprites-generated.css'
+import $ from 'jquery'
+import jsPlumb from 'jsplumb'
 /*eslint-disable */
 export default {
   name: 'jsPlumb',
@@ -17,15 +18,11 @@ export default {
       pstyle: {
         Endpoint: ['Dot', { radius: 2 }],
         paintStyle: {
-          strokeStyle:  '#2f8e00',
-          fillStyle: 'none'
+          strokeStyle:  '#black',
+          fillStyle: '#black'
         },
         connector: ['Flowchart', {stub: [0, 0], gap: 2, cornerRadius: 5, alwaysRespectStubs: true }],
-        connectorStyle: {
-          lineWidth: 1,
-          strokeStyle:  '#2f8e00'
-        },
-        maxConnections: -1
+        maxConnections: 1
       }
     }
   },
@@ -41,26 +38,37 @@ export default {
       this.renderConnect(id)
       this.i++
     },
+    line: function(){
+      let common={
+        overlays:[
+          ["Custom", {
+            create:function(component) {
+                return $("<select id='myDropDown'><option value='foo'>foo</option><option value='bar'>bar</option></select>");                
+              },
+              location:0.5,
+              id:"customOverlay"
+            }]
+         ]
+      }
+      this.instance.connect({ source:"item1", target:"item0" }, common);
+      this.instance.connect({ source:"item2", target:"item1" }, common);
+    },
     initJsPlumb: function () {
+      console.error(jsPlumb)
       var _this=this
-      jsPlumb.bind("ready",function(){
-        _this.instance = jsPlumb.getInstance({
-        Endpoint: ['Dot', {radius: 2}],
-        HoverPaintStyle: { strokeStyle: '#1e8151', lineWidth: 2 },
+      jsPlumb.jsPlumb.bind("ready",function(){
+        _this.instance = jsPlumb.jsPlumb.getInstance({
+        Endpoint: ['Dot', {radius: 1}],
         ConnectionOverlays: [
-          [ 'Arrow', {location: 1, id: 'arrow', length: 10, foldback: 0.8, width: 10} ],
-          [ 'Label', {abel: '', id: 'label', cssClass: 'labelstyle' }]
+          [ 'Arrow', {location: 1, id: 'arrow', length: 10, foldback: 0.8, width: 10} ]
         ],
         DragOptions: { zIndex: 2000 },
         Container: 'topocontent'
       })
       /* 连线后触发 */
       _this.instance.bind('connection', function (info) {
-        var labelText = '同意'
-        info.connection.id = '0001'
-        info.connection.setLabel(labelText)
         console.log(info)
-        if (info.sourceId == info.targetId) {
+        if (info.sourceId == info.targetId) { 
           alert('不能让以自己为目标元素')
           _this.instance.detach(info)
         }
@@ -71,19 +79,8 @@ export default {
     renderConnect:function (newid) { // 渲染
       this.instance.draggable(newid)
       var _this=this
-      this.instance.doWhileSuspended(function () {
-        var isFilterSupported = _this.instance.isDragFilterSupported()
-        if (isFilterSupported) {
-          _this.instance.makeSource(newid, {filter: '.dragPoint', anchor: 'Continuous'}, _this.pstyle)
-        } else {
-          var eps = jsPlumb.getSelector('.dragPoint')
-          for (var i = 0; i < eps.length; i++) {
-            var e = eps[i], p = e.parentNode
-            _this.instance.makeSource(e, {parent: p, anchor: 'Continuous'}, _this.pstyle)
-          }
-        }
-      })
-      _this.instance.makeTarget(newid, {dropOptions: {hoverClass: 'dragHover'}, anchor: 'Continuous'}, _this.pstyle)
+      _this.instance.makeSource(newid, {filter: '.dragPoint', anchor: 'Continuous'},_this.pstyle)
+      _this.instance.makeTarget(newid, {dropOptions: {hoverClass: 'dragHover'}, anchor: 'Continuous'},_this.pstyle)
   }
   }
 }
