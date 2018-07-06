@@ -25,6 +25,11 @@ export default new Router({
                     meta: { title: '基础表格' }
                 },
                 {
+                    path: '/layout',
+                    component: resolve => require(['../components/page/layout.vue'], resolve),
+                    meta: { title: 'css布局' }
+                },
+                {
                     path: '/tabs',
                     component: resolve => require(['../components/page/Tabs.vue'], resolve),
                     meta: { title: 'tab选项卡' }

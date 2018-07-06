@@ -41,6 +41,11 @@
                         title: '基础表格'
                     },
                     {
+                        icon: 'el-icon-tickets',
+                        index: 'layout',
+                        title: 'CSS布局'
+                    },
+                    {
                         icon: 'el-icon-message',
                         index: 'tabs',
                         title: 'tab选项卡'
